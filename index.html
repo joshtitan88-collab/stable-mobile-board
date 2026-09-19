@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b0f14" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="description" content="Stable progress board — names, percent complete, status chips. Adults 21+." />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="icon.svg" />
+  <title>Stable Board</title>
+  <style>
+    :root {
+      --bg: #0b0f14;
+      --card: #141a22;
+      --card-border: #243041;
+      --text: #e8eef6;
+      --muted: #8b9bb0;
+      --accent: #5b9fd4;
+      --ok: #3ecf8e;
+      --warn: #e6b84d;
+      --locked: #c47aff;
+      --unset: #ff7b72;
+      --bar-bg: #1c2533;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+    body {
+      padding: calc(16px + var(--safe-top)) 16px calc(24px + var(--safe-bottom));
+      max-width: 480px;
+      margin: 0 auto;
+    }
+    header { margin-bottom: 20px; }
+    .eyebrow {
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+    }
+    .updated {
+      margin-top: 10px;
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+    .updated strong { color: var(--text); font-weight: 600; }
+    .note {
+      margin-top: 12px;
+      padding: 12px 14px;
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+    .list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 18px;
+    }
+    .card {
+      display: block;
+      width: 100%;
+      text-align: left;
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 16px 16px 14px;
+      min-height: 88px;
+      color: inherit;
+      cursor: default;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    .row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .name {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+    .pct {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      font-variant-numeric: tabular-nums;
+      color: var(--accent);
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    .status-line {
+      margin-top: 8px;
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 32px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      border: 1px solid transparent;
+    }
+    .chip-progress {
+      background: rgba(91, 159, 212, 0.15);
+      color: var(--accent);
+      border-color: rgba(91, 159, 212, 0.35);
+    }
+    .chip-ok {
+      background: rgba(62, 207, 142, 0.12);
+      color: var(--ok);
+      border-color: rgba(62, 207, 142, 0.35);
+    }
+    .chip-warn {
+      background: rgba(230, 184, 77, 0.14);
+      color: var(--warn);
+      border-color: rgba(230, 184, 77, 0.35);
+    }
+    .chip-locked {
+      background: rgba(196, 122, 255, 0.14);
+      color: var(--locked);
+      border-color: rgba(196, 122, 255, 0.4);
+    }
+    .chip-unset {
+      background: rgba(255, 123, 114, 0.14);
+      color: var(--unset);
+      border-color: rgba(255, 123, 114, 0.4);
+    }
+    .bar {
+      margin-top: 14px;
+      height: 8px;
+      background: var(--bar-bg);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .bar > span {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #3a7eb0, var(--accent));
+    }
+    footer {
+      margin-top: 24px;
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="eyebrow">Stable · adults 21+</div>
+    <h1>Progress board</h1>
+    <p class="updated">Last updated: <strong id="updated">Sat Sep 19, 2026 · 4:43 AM ET</strong></p>
+    <p class="note">Honest snapshot — no fake 100%. Names + % + status only (no media).</p>
+  </header>
+
+  <ul class="list" id="board" aria-label="Persona progress">
+    <li>
+      <article class="card" aria-label="Sam 72 percent">
+        <div class="row">
+          <div class="name">Sam</div>
+          <div class="pct">72%</div>
+        </div>
+        <p class="status-line">Fillers matched; packing ahead of the pack.</p>
+        <div class="chips">
+          <span class="chip chip-progress">In progress</span>
+          <span class="chip chip-ok">Fillers matched</span>
+        </div>
+        <div class="bar" aria-hidden="true"><span style="width:72%"></span></div>
+      </article>
+    </li>
+    <li>
+      <article class="card" aria-label="Tammy 55 percent">
+        <div class="row">
+          <div class="name">Tammy</div>
+          <div class="pct">55%</div>
+        </div>
+        <p class="status-line">Wan I2V unlocked · dirty stills 8/8 done.</p>
+        <div class="chips">
+          <span class="chip chip-progress">In progress</span>
+          <span class="chip chip-ok">I2V unlocked</span>
+        </div>
+        <div class="bar" aria-hidden="true"><span style="width:55%"></span></div>
+      </article>
+    </li>
+    <li>
+      <article class="card" aria-label="Tessa 50 percent">
+        <div class="row">
+          <div class="name">Tessa</div>
+          <div class="pct">50%</div>
+        </div>
+        <p class="status-line">Mid pipeline — keep pushing plates &amp; fills.</p>
+        <div class="chips">
+          <span class="chip chip-progress">In progress</span>
+          <span class="chip chip-warn">Halfway</span>
+        </div>
+        <div class="bar" aria-hidden="true"><span style="width:50%"></span></div>
+      </article>
+    </li>
+    <li>
+      <article class="card" aria-label="Faith 40 percent">
+        <div class="row">
+          <div class="name">Faith</div>
+          <div class="pct">40%</div>
+        </div>
+        <p class="status-line">Packet work underway; lane currently locked.</p>
+        <div class="chips">
+          <span class="chip chip-locked">Locked</span>
+          <span class="chip chip-progress">40%</span>
+        </div>
+        <div class="bar" aria-hidden="true"><span style="width:40%"></span></div>
+      </article>
+    </li>
+    <li>
+      <article class="card" aria-label="Abby 28 percent">
+        <div class="row">
+          <div class="name">Abby</div>
+          <div class="pct">28%</div>
+        </div>
+        <p class="status-line">Identity / look still unset — plate hunt open.</p>
+        <div class="chips">
+          <span class="chip chip-unset">Unset</span>
+          <span class="chip chip-warn">Needs look</span>
+        </div>
+        <div class="bar" aria-hidden="true"><span style="width:28%"></span></div>
+      </article>
+    </li>
+  </ul>
+
+  <footer>
+    Open in Chrome → menu (⋮) → Add to Home screen<br />
+    $0 static board · update HTML to refresh %
+  </footer>
+</body>
+</html>
